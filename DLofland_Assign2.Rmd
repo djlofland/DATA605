@@ -1,153 +1,123 @@
 ---
-title: "D605 - Homework 1"
+title: "D605 - Homework 2"
 author: "Donny Lofland"
-date: "2/2/2020"
-output: 
+date: "2/9/2020"
+output:
   html_document:
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
 ```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
 
 ## Problem Set 1
 
-You can think of vectors representing many dimensions of related information. For
-instance, Netflix might store all the ratings a user gives to movies in a vector. This is
-clearly a vector of very large dimensions (in the millions) and very sparse as the user might
-have rated only a few movies. Similarly, Amazon might store the items purchased by a user
-in a vector, with each slot or dimension representing a unique product and the value of the
-slot, the number of such items the user bought. One task that is frequently done in these
-settings is to find similarities between users. And, we can use dot-product between vectors
-to do just that. As you know, the dot-product is proportional to the length of two vectors
-and to the angle between them. In fact, the dot-product between two vectors, normalized
-by their lengths is called as the cosine distance and is frequently used in recommendation
-engines.
+(1) Show that $A^{T}A \ne AA^{T}$ in general:
 
-### 1
+$$\text{Given: }A = \left[\begin{array}\\
+a & b\\
+c & d\\\end{array}\right]\ \text{then}\ A^{T} = \left[\begin{array}\\
+a & c\\
+b & d\\\end{array}\right]\\
+\text{show} \ A^{T}A \ne AA^{T}\\
+\left[\begin{array}\\
+a & c\\
+b & d\\\end{array}\right] \left[\begin{array}\\
+a & b\\
+c & d\\\end{array}\right] \ne \left[\begin{array}\\
+a & b\\
+c & d\\\end{array}\right] \left[\begin{array}\\
+a & c\\
+b & d\\\end{array}\right]\\
+\left[\begin{array}\\
+aa+cc & ca+cd\\
+ba+dc & bb+dd\\\end{array}\right] \ne \left[\begin{array}\\
+aa+bb & ac+bd\\
+ca+db & cc+dd\\\end{array}\right]\\
+(aa+cc) \ne (aa+bb), (ca+cd) \ne (ac+bd), (ba+dc) \ne (ca+db), (bb+dd) \ne (cc+dd)\\
+\therefore \\
+A^{T}A \ne AA^{T}
+$$
 
-Calculate the dot product u.v where u = [0.5; 0.5] and v = [3; −4]
+(2) For a special type of square matrix $A$, we get $A^{T}A = AA^{T}$ under what conditions could this be true?
 
-```{r}
-(u <- matrix(c(0.5, 0.5), nrow=1, ncol=2))
-(v <- matrix(c(3, -4), nrow=1, ncol=2))
+$$\text{Given: }A = \left[\begin{array}\\
+a & b & c\\
+d & e & f\\
+g & h & i
+\end{array}\right]\ then\ A^{T} = \left[\begin{array}\\
+a & d & g\\
+b & e & h\\
+c & f & i
+\end{array}\right]$$
 
-(dot_prod <- u %*% t(v))
-```
-
-
-### 2
-
-What are the lengths of u and v? Please note that the mathematical notion of the
-length of a vector is not the same as a computer science definition.
-
-```{r}
-(norm_u <- norm(u, "F"))
-(norm_v <- norm(v, "F"))
-```
-
-### 3 
-
-What is the linear combination: 3u − 2v?
-
-```{r}
-(3*u  - 2*v)
-```
-
-
-### 4
-
-What is the angle between u and v
-
-```{r}
-(theta <- as.numeric(acos(dot_prod / (norm_u * norm_v))))
-```
-
+$A^{T}A = AA^{T}$ would hold true if $b=d, c=g, f=h$ since $A^{T}$ would then equal $A$ and the problem simplifies to $AA = AA$
 
 ## Problem Set 2
 
-Set up a system of equations with 3 variables and 3 constraints and solve for x. Please
-write a function in R that will take two variables (matrix A & constraint vector b) and
-solve using elimination. Your function should produce the right answer for the system of
-equations for any 3-variable, 3-equation system. You don’t have to worry about degenerate
-cases and can safely assume that the function will only be tested with a system of equations
-that has a solution. Please note that you do have to worry about zero pivots, though. Please
-note that you should not use the built-in function solve to solve this system or use matrix
-inverses. The approach that you should employ is to construct an Upper Triangular Matrix
-and then back-substitute to get the solution. Alternatively, you can augment the matrix
-A with vector b and jointly apply the Gauss Jordan elimination procedure
+Matrix factorization is a very important problem. There are supercomputers built just
+to do matrix factorizations. Every second you are on an airplane, matrices are being
+factorized. Radars that track flights use a technique called Kalman filtering. At the heart
+of Kalman Filtering is a Matrix Factorization operation. Kalman Filters are solving linear
+systems of equations when they track your flight using radars.
 
-Please test it with the system below and it should produce a solution x = [−1.55, −0.32, 0.95]
+Write an R function to factorize a square matrix A into LU or LDU, whichever you
+prefer. Please submit your response in an R Markdown document using our class naming
+convention, E.g. LFulton_Assignment2_PS2.png
 
-$$
-\left[\begin{array}\\
-1 & 1 & 3\\
-2 & -1 & 5\\
--1 & -2 & 4
-\end{array}\right]
-\left[\begin{array}\\
-x_{1}\\ 
-x_{2}\\
-x_{3}
-\end{array}\right] = \left[\begin{array}\\
-1\\ 
-2\\
-6\\
-\end{array}\right]
-$$
+You don’t have to worry about permuting rows of A and you can assume that A is less
+than 5x5, if you need to hard-code any variables in your code. If you doing the entire
+assignment in R, then please submit only one markdown document for both the problems.
 
 ```{r}
-solve_by_elimination <- function(A, b) {
+factor_matrix <- function(A) {
+  size <- nrow(A)
+  max <- size - 1
   
-  # Pivot column 1
-  p <- A[1,1]
-  if(p != 0) {
-    A[1,] <- A[1,] / p
-    b[1] <- b[1] / p
-  }  
+  # Build our base L matrix
+  L <- matrix(0, nrow=size, ncol=size)
   
-  c <- A[2,1]
-  A[2,] <- A[2,] - c * A[1,]
-  b[2] <- b[2] - c * b[1]
-  
-  c <- A[3,1]
-  A[3,] <- A[3,] - c * A[1,]
-  b[3] <- b[3] - c * b[1]
-
-  # pivot column 2
-  p <- A[2,2]
-  if(p != 0) {
-    A[2,] <- A[2,] / p
-    b[2] <- b[2] / p
-  }
-  c <- A[3,2]
-  A[3,] <- A[3,] - c * A[2,]
-  b[3] <- b[3] - c * b[2]
-
-  #Pivot column 3
-  p <- A[3,3]
-  if(p != 0) {
-    A[3,] <- A[3,] / p
-    b[3] <- b[3] / p
+  for (i in 1:size) {
+    L[i,i] = 1L
   }
   
-  # Back substitute
-  b[2] <- b[2] - A[2,3] * b[3]
-  b[1] <- b[1] - A[1,2] * b[2] - A[1,3] * b[3]
+  # Copy A into U - we will be decompsing U as we go and keep our orig A
+  U <- matrix(0, nrow=size, ncol=size)
+  for (r in 1:size) {
+    for (c in 1:size) {
+      U[r,c] <- A[r,c]
+    }
+  }
   
-  return(as.vector(b))
+  for (c in 1:max) {
+    base_row <- c
+    next_row <- c+1
+    
+    for (r in next_row:size) {
+      # print(c(c, r))
+      
+      L[r, c] = U[r, c] / U[base_row, c]
+      U[r,] = U[r,] - U[base_row,] * L[r, c]
+    }
+  }
+  
+  U <- round(U, 5)
+  L <- round(L, 5)
+  
+  return(list("A"=A, "U"=U, "L"=L))
 }
 
-A <- matrix(c(1,1,3,2,-1,5,-1,-2,4), byrow=T, nrow=3, ncol=3)
-b <- matrix(c(1,2,6), byrow=T, nrow=3, ncol=1)
+matrix_size <- 6
+A <- matrix(sample(-100:100, matrix_size^2), byrow=T, nrow=matrix_size, ncol=matrix_size)
+result <- factor_matrix(A)
 
-solve_by_elimination(A, b)
-
-# confirmation with built-in function
-library(matlib)
-(gaussianElimination(A, b))
-
+print(result)
 ```
 
