@@ -1,0 +1,72 @@
+---
+title: "DLofland_DiscussProblem3"
+author: "Donny Lofland"
+date: "2/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+```
+
+## EE C12
+
+Find the characteristic polynomial of the matrix:
+
+$$A = \left[\begin{array}\\1 & 2 & 1 & 0\\
+1 & 0 & 1 & 0\\
+2 & 1 & 1 & 0\\
+3 & 1 & 0 & 1\\
+\end{array}\right]$$
+
+Then the **characteristic polynomial** of $A$ is the polynomial $p_{A} (x)$ defined by:
+
+$$p_{A} (x) = det (A -xI{_n})$$
+
+**Solve:**
+
+\begin{align}
+p_{A} (x) &= det (A -xI{_n})\\
+p_{A} (x) &= \left|\begin{array}\\(1-x) & 2 & 1 & 0\\1 & (0-x) & 1 & 0\\2 & 1 & (1-x) & 0\\3 & 1 & 0 & (1-x)\\\end{array} \right|\\
+
+p_{A} (x) &= (1-x)\left|\begin{array}\\-x & 1 & 0\\1 & (1-x) & 0\\1 & 0 & (1-x)\\\end{array}\right| 
+- (2) \left|\begin{array}\\1 & 1 & 0\\2 & (1-x) & 0\\3 & 0 & (1-x)\\\end{array}\right| 
++ (1) \left|\begin{array}\\1 & -x & 0\\2 & 1 & 0\\3 & 1 & (1-x)\\\end{array}\right|
+-(0) \left|\begin{array}\\1 & -x & 1\\2 & 1 & 1-x\\3 & 1 & 0\\\end{array}\right|\\
+\end{align}\\
+
+\begin{align}
+(1-x)\left|\begin{array}\\-x & 1 & 0\\1 & 1-x & 0\\1 & 0 & 1-x\\\end{array}\right| 
+  &=(1-x) [ (-x)(1-x)^{2} - 1+x) ] \\
+  &=(1-x)[(-x)(1-2x+x^2)-1+x]\\
+  &=(1-x)[-x+2x^2-x^3-1+x]\\
+  &=(1-x)(-x^3+2x^2-1)\\
+  &=-x^3+2x^2-1+x^4-2x^3+x\\
+  &=-x^3+2x^2-1+x^4-2x^3+x\\
+  &=(x^4-3x^3+2x^2+x-1)\\
+
+-(2)\left|\begin{array}\\1 & 1 & 0\\2 & (1-x) & 0\\3 & 0 & (1-x)\\\end{array}\right| 
+  &= (-2) [(1-x)^2-2(1-x)+0] \\
+  &= (-2)[1-2x+x^2-2+2x]\\
+  &= (-2)(x^2-1)\\
+  &= (-2x^2+2)\\
+
++(1) \left|\begin{array}\\1 & -x & 0\\2 & 1 & 0\\3 & 1 & (1-x)\\\end{array}\right| 
+  &= (1)(1-x) - (-x)[2(1-x)]\\
+  &= (1-x) + x(2-2x)\\
+  &= (1-x) + 2x-2x^2\\
+  &= (-2x^2+x+1)\\
+  
+-(0) \left|\begin{array}\\1 & -x & 1\\2 & 1 & 1-x\\3 & 1 & 0\\\end{array}\right|
+&= 0
+\end{align}
+
+\begin{align}
+p_{A}(x) &= (x^4-3x^3+2x^2+x-1) + (-2x^2+2) + (-2x^2+x+1) + (0)\\
+  &= x^4 - 3x^3 - 2x^2 + 2x + 2
+\end{align}
+
+
+
+
