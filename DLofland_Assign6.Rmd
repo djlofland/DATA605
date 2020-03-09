@@ -237,21 +237,20 @@ me the table or the formulaic solution or both.)
 |         |     Predict    |
 | actual  | lie   | truth  |
 | --------|-------|--------|-------
-| lie     | 0.59  | 0.1    | 0.69
-| truth   | 0.41  | 0.9    | 1.31
-|         | 1.00  | 1.00   |
+| lie     | 108   |  92    |  200
+| truth   |  80   | 720    |  800
+|         | 188   | 812    | 1000
 
-P(lie) = 0.20
+P(lie) = 0.20  (200/1000)
+\
+P(truth) = 0.8 (800/1000)
 
-P(Detect Lie | Lie) = 0.59
+P(Detect Lie | Lie) = 0.59  (108/200)
 
-P(Detect Truth | Truth) = 0.9
+P(Detect Truth | Truth) = 0.9 (720/800)
 
 ```{r}
-p_lie <- 0.2
-p_screen_lie <- 0.59
-
-((p_screen_lie * p_lie) / 0.69)
+(108/188)
 ```
 
 
@@ -259,10 +258,7 @@ b) What is the probability that an individual is actually a truth-teller given t
 such? (Show me the table or the formulaic solution or both.)
 
 ```{r}
-p_truth = 0.8
-p_screen_truth = 0.9
-
-((p_screen_truth * p_truth) / 1.31)
+(720/812)
 ```
 
 
@@ -276,6 +272,6 @@ P(Detect_liear) = 0.59
 Prob(Liar or Detected Liar) = P(Liar) + P(Detect Liar) - P(Liar and Detect)
 
 ```{r}
-(prob <- 0.2 + 0.59 - (p_screen_lie * p_lie) / 0.69)
+(prob <- (200 + 188 - 108) / 1000)
 ```
 
