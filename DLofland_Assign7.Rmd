@@ -1,0 +1,116 @@
+---
+title: "D605 - Homework 7"
+author: "Donny Lofland"
+date: "3/15/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+library(pracma)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Problem 1
+
+1) Let X1, X2, . . . , $X_n$ be n mutually independent random variables, each of which is uniformly distributed on the integers from 1 to k. Let Y denote the minimum of the $X_i$’s. Find the distribution of Y.
+
+> I coulnd't figure this one out.  I found several references on the internet showing the solution, but couldn't understand them sufficiently to feel good about providing an answer ... that would have been just copying and cheating.  So, I tried, but don't know how to solve this.
+
+## Problem 2
+
+2) Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer’s expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.).
+
+a) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years.)
+
+Assumption: There is a uniform probability of failure each year over the 10 years.  So the probability on any given year is $\frac{1}{10}$.  
+
+P(x=n) = $(1-P)^{n-1}P$ where $P = 0.1$
+
+Since we are interested in failure after year 8, we can look at the probability of failing on year 9 or failing on year 10.
+
+```{r}
+P <- 0.1
+prob_y9 <- (1 - P)^(9-1) * P
+prob_y10 <- (1 - P)^(10-1) * P
+(prob_y9or10 <- prob_y9 + prob_y10)
+mu <- 1/P
+sigma <- sqrt((1-P)/P^2)
+```
+
+
+$\mu = \frac{1}{P} = \frac{1}{0.1} =$ `r mu`
+
+$\sigma = \sqrt{\frac{1-P}{P^2}} = \sqrt{\frac{1-0.1}{0.1^2}} =$ `r sigma`
+
+b) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as an exponential.
+
+$P(X \le k) = 1 - e^{\frac{-k}{\mu}}$
+
+$P(X \ge k) = e^{\frac{-k}{\mu}}$
+
+We are given $\mu = 10$ 
+
+```{r}
+P <- 0.1
+mu <- 1 / P
+x <- 8
+(prob <- exp(-x/mu))
+(sigma <- sqrt(1/P^2))
+```
+
+$$\mu = \frac{1}{\lambda} = \frac{1}{0.1} = 10$$
+
+$$\sigma = \sqrt{\frac{1}{\lambda^2}} = \sqrt{\frac{1}{0.1^2}} = 10$$
+
+c) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years) 
+
+$k=0, n=8, p=0.1$
+
+$$P(x=n) = \frac{n!}{k!(n-k)!}*p^k*(1-p)^{(n-k)}$$
+
+```{r}
+p <- 0.1
+n <- 8
+k <- 0
+(prob <- fact(n)/(fact(k)*fact(n-k))*p^k*(1-p)^(n-k) )
+
+(mu <- n * p)
+(sigma <- sqrt(n*p*(1-p)))
+```
+
+$$\mu = n*p = 8 * 0.1 = 0.8$$
+
+$$\sigma = \sqrt{n*p*(1-p))} = \sqrt{8*0.1*(1-0.1)} = 0.8485281$$
+
+d) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a Poisson. 
+
+Rate is 1 per 10 years = 0.1
+
+$r = 0.1, t=8, k=0$
+
+$$Prob(k\text{ events in interval }t\text{ with rate }r) = \frac{(rt)^k * e^{-rt}}{k!}$$
+
+$$P(0) = \frac{(0.1*8)^0 * e^{-0.1*8}}{0!}  = e^{-0.1*8} = 0.449329$$
+
+```{r}
+r <- 0.1
+k <- 0
+t <- 8
+
+(prob <- ((r*t)^k * exp(-r*t))/fact(k))
+(mu <- 0.1)
+(lambda <- 0.1)
+(sigma <- sqrt(lambda))
+```
+
+$$\mu = \lambda = 0.1$$
+
+$$\sigma = \sqrt{\lambda} = \sqrt{0.1} = 0.3162278$$
