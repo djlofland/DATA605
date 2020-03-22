@@ -1,0 +1,108 @@
+---
+title: "D605 - Homework 8"
+author: "Donny Lofland"
+date: "3/21/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+library(pracma)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Problem 11 (p 303)
+
+A company buys 100 lightbulbs, each of which has an exponential lifetime of
+1000 hours. What is the expected time for the first of these bulbs to burn
+out? (See Exercise 10.)
+
+$$\text{from Ex 10: } M = min(X_j),\ \  \ mean = \mu/n \\
+\mu = 1000, n = 100$$
+
+```{r}
+n <- 100
+mu <- 1000
+
+(expected <- mu/n)
+```
+
+
+## Problem 14 (p 303)
+
+Assume that $X_1$ and $X_2$ are independent random variables, each having an
+exponential density with parameter $\lambda$. Show that $Z = Y − X$ has density:
+
+$$f_Z(z) = (\frac{1}{2})\lambda e^{-\lambda|z|}$$
+
+$$ f_{X}(x) = f_{Y}(x) = \left\{ 
+\begin{array}\\
+\lambda e^{-\lambda x}, & \text{if }x \ge 0,\\
+0, & \text{otherwise;}\\
+\end{array}
+\right.$$
+
+
+$$\text{Given: } Z = Y-X \text{, rearrange to get: } Y = X+Z$$
+
+$$
+P(Z \le z) = \int_{0}^{\infty}\lambda e^{-\lambda x} ( \int_{0}^{x+z} \lambda e^{-\lambda y} dy) dx\\
+= \int_{0}^{\infty}\lambda e^{-\lambda x} ( 1 - e^{-\lambda (x+z)}) dx\\
+= \int_{0}^{\infty}\lambda e^{-\lambda x} - \lambda e^{-\lambda x} e^{-\lambda (x+z)}) dx\\
+= \int_{0}^{\infty}\lambda e^{-\lambda x} - \int_{0}^{\infty}\lambda e^{-\lambda x} e^{-\lambda (x+z)}) dx\\
+= 1 - \lambda \int_{0}^{\infty} e^{(-2\lambda x - \lambda z)}) dx\\
+P(Z \le z) = 1 - \lambda \frac{e^{-\lambda z}}{2\lambda} = 1 - \frac{1}{2}e^{-\lambda z}\\
+\text{now differentiate with respect to Z to get the density function}\\
+f_Z(z) = \frac{d}{dz}(1 - \frac{e^{-\lambda z}}{2}) = \frac{1}{2}\lambda e^{-\lambda z}$$
+
+
+## Problem 1 (p 320-321)
+
+Let X be a continuous random variable with mean $\mu=10$ and variance
+$\sigma^2 = 100/3$. Using Chebyshev’s Inequality, find an upper bound for the
+following probabilities.
+
+```{r}
+variance <- 100/3  # note this is sigma^2
+mu <- 10
+```
+
+ 
+(a) $P(|X − 10| \ge 2)$.
+
+```{r}
+e <- 2
+(upper <- variance / e^2)
+```
+
+
+(b) $P(|X − 10| \ge 5)$
+
+```{r}
+e <- 5
+(upper <- variance / e^2)
+```
+
+
+(c) $P(|X − 10| \ge 9)$
+
+```{r}
+e <- 9
+(upper <- variance / e^2)
+```
+
+
+(d) $P(|X − 10| \ge 20)$
+
+```{r}
+e <- 20
+(upper <- variance / e^2)
+```
+
