@@ -1,0 +1,97 @@
+---
+title: "D605 - Homework 9"
+author: "Donny Lofland"
+date: "3/29/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Problem 11 (p 363)
+
+The price of one share of stock in the Pilsdorff Beer Company (see Exercise 8.2.12) is given by $Y_n$ on the $n$th day of the year. Finn observes that the differences $X_n = Y_{n+1} − Y_n$ appear to be independent random variables
+with a common distribution having mean $\mu=0$ and variance $\sigma^2 = 1/4$. If $Y_1 = 100$, estimate the probability that $Y_{365}$ is
+
+```{r}
+y1 <- 100
+x_mu <- 0
+x_var <- 0.25
+n <- 364
+mu <- x_mu * n
+var <- x_var * n
+sigma <- sqrt(var)
+```
+
+
+(a) $\ge 100$.
+
+```{r}
+y365 <- 100
+z <- (y365-y1)/sigma
+(1 - pnorm(z, mu, sigma))
+```
+
+
+(b) $\ge 110$.
+
+```{r}
+y365 <- 110
+z <- (y365-y1)/sigma
+(1 - pnorm(z, mu, sigma))
+```
+
+
+(c) $\ge 120$.
+
+```{r}
+y365 <- 120
+z <- (y365-y1)/sigma
+(1 - pnorm(z, mu, sigma))
+```
+
+
+## Problem 2
+
+Calculate the expected value and variance of the binomial distribution using the moment generating function.
+
+$$\begin{array}\\binom(x; n, p) = \frac{n!}{x!(n-x)!} p^x q^{n-x} & \text{where: }q=1-p\\ \end{array}\\
+M_{x}(t) = \sum_{x=0}^{n}e^{xt} \frac{n!}{x!(n-x)!} p^x q^{n-x}\\
+= \sum_{x=0}^{n}(pe^t)^x  \frac{n!}{x!(n-x)!} q^{n-x}\\
+M_{x}(t)= (q + pe^t)^n\\
+M_{x}^{'}(t) = n(q + pe^t)^{n-1} pe^t = npe^t(q+pe^t)^{n-1}\\
+E(x) = M_{x}^{'}(0) = np(q+p)^{n-1} = np((1-p)+p)^{n-1} = np(1)^{n-1} = np\\
+\text{using product rule:}\\
+M_{x}^{"}(t) = npe^t ({(n-1)(q+pe^t)^{n-2} pe^t + (q+pe^t}^{n-1}(npe^t)\\
+= npe^t (q+pe^t)^{n-2}((n-1)pe^t + (q+pe^t))\\
+= npe^t (q+pe^t)^{n-2} (q+npe^t)\\
+E(x^2) = M_{x}^{"}(0) = np(q+p)^{n-2}(q+np) = np(q+np)\\
+\sigma^2 = E(x^2) - (E(x)^2) = np(q+np) - n^2p^2 = npq
+$$
+
+
+## Problem 3
+
+Calculate the expected value and variance of the exponential distribution using the moment generating function.
+
+$$\begin{array}\\
+f(x) = \lambda e^{-\lambda x} & 0 < x < \infty\\
+\end{array}\\
+E(e^{tx}) = E(g(x) = \int_{0}^{\infty}g(x) f(x) dx\\
+= \int_{0}^{\infty}e^{tx} \lambda e^{-\lambda x} dx\\
+= \lambda \int_{0}^{\infty} e^{(t-\lambda)x}dx\\
+= \frac{e^{x(t-\lambda)}}{t-\lambda}|_{0}^{\infty}
+= \frac{\lambda}{\lambda - t}\\
+M_{x}(t) = \frac{\lambda}{\lambda - t}\\
+M_{x}^{'}(t) = \frac{\lambda}{(\lambda-t)^2}\ \ \ \ \ \ \ E(x) = M_{x}^{'}(0) = \frac{\lambda}{(\lambda-0)^2} = \frac{1}{\lambda}\\
+M_{x}^{"}(t) = \frac{\lambda+t}{(\lambda-t)^3}\ \ \ \ \ \ \ E(x^2) = M_{x}^{"}(0) = \frac{\lambda+0}{(\lambda-0)^3} = \frac{1}{\lambda^2}\\
+$$
