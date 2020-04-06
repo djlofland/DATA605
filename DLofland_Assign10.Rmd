@@ -1,0 +1,144 @@
+---
+title: "D605 - Homework 10"
+author: "Donny Lofland"
+date: "4/05/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Smith in Jail
+
+Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars.
+A guard agrees to make a series of bets with him. If Smith bets A dollars,
+he wins A dollars with probability .4 and loses A dollars with probability .6.
+
+Find the probability that he wins 8 dollars before losing all of his money if:
+
+a) he bets $1 each time (timid strategy)
+
+```{r}
+# -----------Solve by Simulation -----------
+
+p <- 0.4   # Probability of success
+q <- 1 - p # Probability of fail
+start <- 1 # initial starting currency
+sim_len <- 1000000
+
+w <- 0 
+l <- 0
+bet <- 1
+
+for (s in 1:sim_len) {
+  sum <- start
+  
+  while (sum > 0 && sum < 8) {
+    if (runif(1, 0, 1.0) <= p) {
+      sum <- sum + bet
+    } else {
+      sum <- sum - bet
+    }
+  }
+  
+  if (sum == 0) {
+    l <- l + 1
+  } else {
+    w <- w + 1
+  }
+}
+
+print(paste('wins: ', w, 'losses: ', l))
+(w / (w+l))
+```
+
+```{r}
+# -----------Solve by Math -----------
+Q <- matrix(
+  c(0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.6, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.6, 0.0, 0.4, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.6, 0.0, 0.4, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.6, 0.0, 0.4, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.6, 0.0, 0.4,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.6, 0.0
+    ),
+  nrow = 7,
+  ncol = 7,
+  byrow = TRUE
+)
+
+R <- matrix(
+  c(0.6, 0.0, 
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.4
+    ), 
+  nrow = 7, 
+  ncol = 2,
+  byrow = TRUE
+)
+
+I <- diag(7)
+(N <- solve(I-Q))
+(B <- N %*% R)
+```
+
+> The probabillity from starting at state 1 ($1) and ending in absobption state ($8) is **`r B[1,2]`**
+
+b) he bets, each time, as much as possible but not more than necessary to
+bring his fortune up to 8 dollars (bold strategy).
+
+```{r}
+# -----------Solve by Simulation -----------
+
+p <- 0.4   # Probability of success
+q <- 1 - p # Probability of fail
+start <- 1 # initial starting currency
+sim_len <- 1000000
+
+w <- 0 
+l <- 0
+
+for (i in 1:sim_len) {
+  sum <- start
+  
+  while (sum > 0 && sum < 8) {
+    bet <- min(sum, 8-sum)
+      
+    if (runif(1, 0, 1.0) <= p) {
+      sum <- sum + bet
+    } else {
+      sum <- sum - bet
+    }
+  }
+  
+  if (sum == 0) {
+    l <- l + 1
+  } else {
+    w <- w + 1
+  }
+}
+
+print(paste('wins: ', w, 'losses: ', l))
+(w / (w+l))
+```
+
+In the second scenario, with each bet, Smith doubles his money if he wins and is out if he looses.  So, he needs to win 3 times in a row to have \$8 (\$1 -> \$2 -> \$4 -> \$8) and there is only one path to success.  This is just $0.4^3$ = `r 0.4^3`.
+
+c) Which strategy gives Smith the better chance of getting out of jail?
+
+> Based on simulation and math, the **BOLD** strategy hedges Smith's bet and improves his chances of making bail. 
+
