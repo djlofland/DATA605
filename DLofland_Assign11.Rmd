@@ -1,0 +1,52 @@
+---
+title: "D605 - Homework 11"
+author: "Donny Lofland"
+date: "4/19/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## CARS Analysis
+
+Using the **cars** dataset in R, build a linear model for stopping distance as a function of speed and
+replicate the analysis of your textbook chapter 3 (visualization, quality evaluation of the model, and
+residual analysis.)
+
+```{r load_data}
+# ----------- Load cars dataset -----------
+data(cars)
+
+cor(cars$dist, cars$speed)
+
+model <- lm(dist ~ speed, cars)
+summary(model)
+
+plot(dist ~ speed, cars)
+abline(model)
+
+plot(model$residuals ~ cars$speed)
+abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
+
+hist(model$residuals)
+
+qqnorm(model$residuals)
+qqline(model$residuals)
+```
+
+## Notes:
+- Both the Residuals Normal and QQ plots show some outliers in the upper range of speed, but with the exception of those few datapoints, overall, residuals are normally distributed.  This is good.
+- Looking at the Residuals plot (vs speed), there aren't any clear patterns of concern (ie residuals appear to be be fairly randomly distributed)
+- Our adjusted r-squared, 0.6438, suggests our model explains about 64% of the variability in the data.  The other 35% we cannot explain with the given data.  If I were doing a better study, I might include columns for vehicle weight, tire size, tire age, presense of autolocking brakes, etc.  Very likley we could find other variables that help further explain the variability and create a better predictive model.
+- stopping distance increases by ~3.9 ft per mph of speed (note the intercept of -17.6) - obviously, if speed were 0, then stopping distance would be 0.  Since we don't have very many data points < 5 mph, this model probably isn't reliable outside the bounds of data we were provided.
+- Our p-value, 1.49e-12, indicates that that speed is highly significant as a predictor.
