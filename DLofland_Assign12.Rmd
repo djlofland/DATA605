@@ -1,0 +1,169 @@
+---
+title: "D605 - Homework 12"
+author: "Donny Lofland"
+date: "4/26/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## WHO 2008 Dataset REgression
+
+The attached who.csv dataset contains real-world data from 2008. The variables included follow:
+
+- Country: name of the country
+- LifeExp: average life expectancy for the country in years
+- InfantSurvival: proportion of those surviving to one year or more
+- Under5Survival: proportion of those surviving to five years or more
+- TBFree: proportion of the population without TB.
+- PropMD: proportion of the population who are MDs
+- PropRN: proportion of the population who are RNs
+- PersExp: mean personal expenditures on healthcare in US dollars at average exchange rate
+- GovtExp: mean government expenditures per capita on healthcare, US dollars at average exchange rate
+- TotExp: sum of personal and government expenditures.
+
+```{r}
+who <- read.csv('who.csv')
+head(who)
+```
+
+### Problem 1
+
+1. Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the
+variables. Provide and interpret the F statistics, R^2, standard error,and p-values only. Discuss
+whether the assumptions of simple linear regression met.
+
+#### Model
+
+```{r load_data}
+# ----------- Load WHO dataset -----------
+cor(who$LifeExp, who$TotExp)
+
+model <- lm(LifeExp ~ TotExp, who)
+summary(model)
+
+plot(LifeExp ~ TotExp, who)
+abline(model)
+
+plot(model$residuals ~ who$TotExp)
+abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
+
+hist(model$residuals)
+
+qqnorm(model$residuals)
+qqline(model$residuals)
+```
+
+#### Discussion:
+
+- **Assumptions** - Our assumptions for a linear regression are **NOT** met.  Problems we see include: 1) plotting LifeExp vs TotExp, it's clear the raw data points do NOT follow a linear relationship.  If anything it looks more like an exponential relationship.  2) The residuals are NOT normally distributed and the residual when plotted against TotExp show a clear pattern (they should be randomly distributed).  Our QQ plot confirms that the data doesn't conform to a linear model and shows strong skew (note the concave nature of the QQ plot)
+- **F Statistic** - 65.26 - This high value would normally indicate significance, but as we saw in the assumptions, a linear regression is **NOT** appropriate for this data and as a result, the F Statistic is not informative.
+- **^R^2** - 0.2577 - The linear model explains 25.77% of the variability in LifeExp using TotExp.  This is a low value.
+- **Standard Error** - 7.795e-06 - actually "Residual Standard Error"  - this is calculated as sqrt(SSE/(n-(1+k))) where SSE is the sum of residulas squared, k is the number of variable in the model (not counting the intercept), and n is the number of datapoints in the dataset.  The Stand Error for each variable in the model is like a Standard Deviation of the error.
+- **p-value** - 7.714e-14 - While the p-value would suggest this model is significant (p-value < 0.05), we saw when looking at assumptions, a linear regression is **NOT** appropriate for these variables and as a result, the p-value isn't informative.
+
+### Problem 2
+
+2. Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06
+power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and r
+re-run the simple regression model using the transformed variables. Provide and interpret the F
+statistics, R^2, standard error, and p-values. Which model is "better?"
+
+#### Model
+
+```{r}
+who$LifeExpXform <- who$LifeExp^4.6
+who$TotExpXform <- who$TotExp^0.06
+
+cor(who$LifeExpXform, who$TotExpXform)
+
+model <- lm(LifeExpXform ~ TotExp, who)
+summary(model)
+
+plot(LifeExpXform ~ TotExpXform, who)
+abline(model)
+
+plot(model$residuals ~ who$TotExpXform)
+abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
+
+hist(model$residuals)
+
+qqnorm(model$residuals)
+qqline(model$residuals)
+```
+
+#### Discussion
+
+While a linear regression is far more appropraite for the transformed data, it's not perfect.  However, our assumptions are looking better and a linear regression is proably ok in this situation.  
+
+- **Assumptions** - Our assumptions for a linear regression are mostly/almost met.  1) Plotting LifeExpXform vs TotExpXform, the datapoints follow a borad linear relationship.  2) The residuals are closer to normally distributed and the residual when plotted against TotExpXform are more randomly distributed.  We do see some outliers and a little bit of a pattern to residuals, but this is far better than the model in Problem 1.  Our QQ plot confirms that the data conform to a linear model thru most of the datapoints.  We do see some issues at the extremes (outliers) that don't conform to linear auuption, but it's far better than the model in Problem 1.  
+- **F Statistic** - 137.4 - Since our assumptions are basically met, the high F indicates significance.
+- **^R^2** - 0.4222 - The linear model explains 42.22% of the variability in LifeExp using TotExp.
+- **Standard Error** - 1.101e+02 - actually "Residual Standard Error"  - this is calculated as sqrt(SSE/(n-(1+k))) where SSE is the sum of residulas squared, k is the number of variable in the model (not counting the intercept), and n is the number of datapoints in the dataset.  The Stand Error for each variable in the model is like a Standard Deviation of the error.
+- **p-value** - 2.2e-16 - The p-value suggests this model is significant (p-value < 0.05).
+
+### Problem 3
+
+3. Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life
+expectancy when TotExp^.06=2.5. 
+
+```{r}
+pred_lifeExp <- 2.542e+08 + 1.290e+03 * 1.5
+(pred_lifeExp <- pred_lifeExp^(1/4.6))
+```
+
+#### Problem 4
+
+Build the following multiple regression model and interpret the F Statistics, R^2, standard error,
+and p-values. How good is the model?
+
+LifeExp = b0+b1 x PropMD + b2 x TotExp +b3 x PropMD x TotExp
+
+#### Model
+
+```{r}
+model <- lm(LifeExp ~ PropMD * TotExp, who)
+summary(model)
+
+plot(LifeExp ~ PropMD * TotExp, who)
+abline(model)
+
+plot(model$residuals ~ PropMD * TotExp, who)
+abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
+
+hist(model$residuals)
+
+qqnorm(model$residuals)
+qqline(model$residuals)
+```
+
+#### Discussion
+
+- **Assumptions** - Our assumptions for a linear regression are *mostly/almost**NOT** met.  AS a result, a linear model is not appriate to model the relationship between these variables.  1) Plotting LifeExp vs TotExp and LifeExp vs PropMD, the datapoints do not follow linear relationship.  2) The residuals are NOT normally distributed and the residual when plotted against TotExp and PropMD show a clear patterns (they should be randomly distributed).  Our QQ plot confirms that the data doesn't conform to a linear model and shows strong skew (note the concave nature of the QQ plot) 
+- **F Statistic** - 34.49 - Since our assumptions are NOT met, the F Statistic in not particualrly informative.
+- **^R^2** - 0.3574 - The linear model explains 35.74% of the variability in LifeExp using both TotExp and PropMD.
+- **Standard Error** - 2.788e+02, 8.982e-06 and 1.472e-03 - actually "Residual Standard Error"  - this is calculated as sqrt(SSE/(n-(1+k))) where SSE is the sum of residulas squared, k is the number of variable in the model (not counting the intercept), and n is the number of datapoints in the dataset.  The Standard Error for each variable in the model is like a Standard Deviation of the error.
+- **p-value** - 2.2e-16 - Normally, the p-value would suggest this model is significant (p-value < 0.05); however, since the assumptions for a linear model are not met, the p-value isnt' particularly informative.
+
+### Problem 5
+
+5. Forecast LifeExp when PropMD=.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?
+
+```{r}
+(pred_lifeExp <- 6.277e+01 + 1.497e+03 * 0.03 + 7.233e-05 * 14 + -6.026e-03 * 0.03 * 14)
+```
+
+#### Discussion
+
+- 107.7 years does NOT seem realistic - very few people live to be that old.  It's highly unlikely we'd see such an extreme value from our model.  If anything, 107 years old would be an extreme outlier event.
+- Wehn building the model, it was clear that our assumption were not met for a simple linear regression (even include the interaction term).  As such, we should not rely on any predictions made by the model.
