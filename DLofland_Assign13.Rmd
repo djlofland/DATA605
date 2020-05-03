@@ -1,0 +1,152 @@
+---
+title: "D605 - Homework 13"
+author: "Donny Lofland"
+date: "5/03/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Problem 1
+
+Use integration by substitution to solve the integral below.
+
+$$\int{4e^{-7x}}dx$$
+
+$$u=-7x,\text{    }u'=-7x\ dx = -\frac{1}{7}\\
+\int{4e^{-7x}}dx = 4 \int{e^u} du * u'\\
+-\frac{4}{7}\int{e^u du}\\
+-\frac{4}{7} e^u\\
+-\frac{4}{7} e^{-7X}$$
+
+## Problem 2
+
+Biologists are treating a pond contaminated with bacteria. The level of contamination is changing at a rate of $\frac{dN}{dt} = -\frac{3150}{t^4} - 220$ bacteria per cubic centimeter per day, where $t$ is the number of days since treatment began. Find a function $N(t)$ to estimate the level of contamination if the level after **1 day** was **6530** bacteria per cubic centimeter.
+
+$$\frac{dN}{dt} = \frac{-3150}{t^4} - 220\\
+dn = (\frac{-3150}{t^4} - 220)\ dt\\
+N(t) = \int{-3150*t^{-4} -220}\ dt\\
+N(t) = \frac{-3150}{-3} * t^{-3} - 220t + C\\
+N(t) = 1050 t^{-3} - 220 t + C\\
+6530 = N(1) = 1050 - 220 + C\\
+C = 5700\\
+N(t) = 1050 t^{-3} - 220 t + 5700$$
+
+## Problem 3
+
+Find the total area of the red rectangles in the figure below, where the equation of the line is $f(x)=2x-9$.
+
+$$f(x) = 2x-9\\
+area = \int_{4.5}^{8.5}{2x\ -\ 9\ dx}\\
+area = (x^2 - 9x) \rvert_{4.5}^{8.5}\\
+area = (8.5^2 - 9*8.5) - (4.5^2 - 9*4.5)\\
+area = 16$$
+
+# Problem 4
+
+Find the area of the region bounded by the graphs of the given equations. 
+
+$$y = x^2 - 2x - 2,\ \ \ y = x + 2$$
+
+The area between curves is the absolute value of the difference between their integrals.
+
+$$area = \int{x^2 - 2x - 2\ dx} - \int{x + 2\ dx}\\
+area = \int{x^2 - 2x - 2 - x -2\ dx}\\
+area = \int{x^2 - 3x - 4\ dx}\\
+area = \frac{1}{3}x^3 - \frac{3}{2}x^2 - 4x + C\\$$
+
+Find intersection points (since problem only asks for the bounded region).  Use substitiution and solve for x:
+
+$$x^2 - 2x - 2 = x + 2\\
+x^2 - 3x -4 = 0\\
+(x-4)(x+1) = 0\\
+x = 4, -1$$
+
+Evaluate the integral over -1 to 4:
+
+$$area = (\frac{1}{3}x^3 - \frac{3}{2}x^2 - 4x) \rvert_{-1}^{4}\\
+area = (\frac{4^3}{3}-\frac{3*4^2}{2}-4*4) - (\frac{-1^3}{3}-\frac{3*-1^2}{2}-4*-1)\\
+area = |-\frac{125}{6}| = \frac{125}{6}$$
+
+## Problem 5
+
+A beauty supply store expects to sell 110 flat irons during the next year. It costs $3.75 to store one flat iron for one year. There is a fixed cost of \$8.25 for each order. Find the lot size and the number of orders per year that will minimize
+inventory costs.
+
+D = 110 (Demand, quantity to sell over year)
+Q = Volume per order
+S = 8.25 (Fixed ordering cost)
+C = Unit Cost
+H = 3.75 (Holding cost)
+
+Ordering Cost:
+
+$$\text{Number of Orders} = \frac{D}{Q}$$
+
+Annual Ordering Cost:
+
+$$\text{Annual Ordering Cost} = \frac{D}{Q} * S = 8.25\frac{110}{Q} = \frac{907.5}{Q}$$
+
+Holding Cost:
+
+$$\text{Annual Holding Cost} = \frac{Q}{2}*3.75 = 1.875Q$$
+
+Total Cost with respect to Quantity:
+
+$$\text{Annual Total Cost (T)} = \frac{907.5}{Q} + 1.875Q$$
+
+Minimize Total Cost:
+
+$$\frac{dT}{dQ} = \frac{907.5}{-2}*Q^{-2} + 1.875 = -473.75Q^{-2} + 1.875\\
+\frac{-473.75}{Q^2}+1.875 = 0\\
+Q^2 = \frac{473.75}{1.875} = \sqrt{252.667}\\
+Q \approx 15.90$$
+
+**Q = 16** to minimize overall storage cost
+
+## Problem 6
+
+Use integration by parts to solve the integral below.
+
+$$\int{ln(9x) * x^6}\ dx$$
+
+$$\int{f\ dg} = f*g - \int{g\ df}\\
+\ \\
+\ \\
+f = ln(9x), df = \frac{1}{x}\ dx\\
+dg = x^6\ dx , g = \frac{x^7}{7}\\
+\ \\
+\ \\
+= ln(9x)*\frac{x^7}{7} - \int{\frac{x^7}{7}*\frac{1}{x}\ dx}\\
+= ln(9x)*\frac{x^7}{7} - \frac{1}{7} \int{x^6}\ dx\\
+= ln(9x)*\frac{x^7}{7} - \frac{1}{49} x^7 + C\\
+= \frac{1}{49} x^7 (7*ln(9x) - 1) + C
+$$
+
+## Problem 7
+
+Determine whether $f(x)$ is a probability density function on the interval $[1, e^6]$. If not, determine the value of the
+definite integral.
+
+$$f(x) = \frac{1}{6x}$$
+
+Check 2 conditions:
+
+- f(x) has to be non-negative - YES, we are told it's over the interval $[1, e^6]$ which is positive at all points
+- $\int_{1}^{e^6}{f(x)\ dx} = 1$
+
+$$\int_{1}^{e^6}{\frac{1}{6x}\ dx} = \frac{1}{6} ln(x)\rvert_{1}^{e^6}\\
+= \frac{1}{6} ln(e^6) - \frac{1}{6}ln(1)\\
+= \frac{6}{6} - \frac{0}{6}\\ = 1$$
+
+So, YES, $f(x)$ meets both criteria for being a PDF. 
