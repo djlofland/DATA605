@@ -1,0 +1,82 @@
+---
+title: "D605 - Homework 14"
+author: "Donny Lofland"
+date: "5/10/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Taylor Expansions
+
+This week, we'll work out some Taylor Series expansions of popular functions.  For each function, only consider its valid ranges as indicated in the notes when you are computing the Taylor Series expansion. Please submit your assignment as a R-Markdown document.
+
+Definition 8.7.1 Taylor Polynomial of degree $n$ of $f$ at $x=c$:
+
+$$p_n(x) = f(c) + f'(c)(x-c) + \frac{f''(c)}{2!}(x-c)^2 + \frac{f'''(c)}{3!}(x-c)^3 + ... + \frac{f^{(n)}(c)}{n!}(x-c)^n$$
+
+### Problem 1
+
+$$f(x) = \frac{1}{(1-x)}$$
+
+Solution:
+$$f(x) = \frac{1}{(1-x)}\ \ \ f(0) = 1\\
+f'(x) = \frac{1}{(1-x)^2}\  \ \ f'(0) = 1 = 1!\\
+f''(x) = \frac{2}{(1-x)^3}\  \ \ f''(0) = 2 = 2!\\
+f'''(x) = \frac{6}{(1-x)^4}\  \ \ f'''(0) = 6 = 3!\\
+f''''(x) = \frac{24}{(1-x)^5}\  \ \ f''''(0) = 24 = 4!\\
+f^{(n)}(x) = \frac{n!}{(1-x)^n}\ \ \ f^{(n)}(0) = n!\\$$
+
+Substituting into the Taylor definition where $c=0$:
+
+$$p_n(x) = 1 + \frac{1!}{1!}(x-0)^1 + \frac{2!}{2!}(x-c)^2 + \frac{3!}{3!}(x-c)^3 + ...\\
+p_n(x) = 1 + x + x^2 + x^3 + ... = \sum_{n=0}^{\infty}x^n$$
+
+which converges when $|x| < 1$ or $(-1, 1)$
+
+Note: This is just the geometric series
+
+
+### Problem 2
+
+$$f(x) = e^x$$
+
+$$f(x) = e^x\ \ \ f(0) = 1\\
+f'(x) = e^x\ \ \ f'(0) = 1\\
+f''(x) = e^x\ \ \ f''(0) = 1\\
+f'''(x) = e^x\ \ \ f'''(0) = 1\\
+f''''(x) = e^x\ \ \ f''''(0) = 1\\$$
+
+Substituting into our Taylor definition with $c=0$:
+
+$$p_n(x) = 1 + \frac{1}{1!}(x-0)^1 + \frac{1}{2!}(x-c)^2 + \frac{1}{3!}(x-c)^3 + ...\\
+p_n(x) = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + ... = \sum_{n=0}^{\infty}\frac{x^n}{n!}$$
+
+This converges over all $x$
+
+### Problem 3
+
+$$f(x) = ln(1+x)$$
+
+$$f(x) = ln(1+x)\ \ \ f(0) = 0\\
+f'(x) = \frac{1}{1+x}\ \ \ f'(0) = 1\\
+f''(x) = -\frac{1}{(1+x)^2}\ \ \ f''(0) = -1 = -1!\\
+f'''(x) = \frac{2}{(1+x)^3}\ \ \ f'''(0) = 2 = 2!\\
+f''''(x) = -\frac{6}{(1+4)^4}\ \ \ f''''(0) = -6 = -3!\\$$
+
+Substituting into our Taylor formula at $c=0$:
+
+$$p_n(x) = 0 + 1(x-0)^1 + \frac{-1!}{2!}(x-c)^2 + \frac{2!}{3!}(x-c)^3 + \frac{-3!}{4!}(x-c)^4 + ...\\
+p_n(x) = x - \frac{x^2}{2} + \frac{x^3}{3} - \frac{x^4}{4} + ... = \sum_{n=0}^{\infty}(-1)^{(n-1)}\frac{x^n}{n}$$
+
+$ln(0)$ goes to $-\infty$, so $x$ is not defined at $-1$. When |x| > 1, then $\lim_{n\to\infty}|(-1)^{(n-1)}\frac{x^n}{n}| = \infty$ which diverges. So, $f(x)$ converges when $x$ is in $(-1, 1]$.
