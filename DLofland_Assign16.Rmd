@@ -1,0 +1,245 @@
+---
+title: "D605 - Homework 16"
+author: "Donny Lofland"
+date: "5/14/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+library(Deriv)
+library(reticulate)
+
+Sys.setenv(RETICULATE_PYTHON = "/Users/dlofland/anaconda3/bin/python")
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Problem 1
+
+Find the equation of the regression line for the given points. Round any final values to the nearest hundredth, if necessary.
+
+$$( 5.6, 8.8 ), ( 6.3, 12.4 ), ( 7, 14.8 ), ( 7.7, 18.2 ), ( 8.4, 20.8 )$$
+
+```{r}
+x_values <- c(5.6, 6.3, 7.0, 7.7, 8.4)
+y_values <- c(8.8, 12.4, 14.8, 18.2, 20.8)
+
+x_bar <- mean(x_values)
+y_bar <- mean(y_values)
+
+sd_x <- sd(x_values)
+sd_y <- sd(y_values)
+
+r <- cor(y_values, x_values)
+
+m <- r * (sd_y/sd_x)
+b <- y_bar - m * x_bar
+
+print(paste('y = ', m, ' * x + ', b, sep=''))
+plot(x_values, y_values)
+abline(b, m)
+```
+
+## Problem 2
+
+### Analytic Solution
+
+Find all local maxima, local minima, and saddle points for the function given below. Write your answer(s) in the form
+$( x, y, z )$. Separate multiple points with a comma.
+
+$$f(x, y) = 24x - 6xy^2 - 8y^3$$
+
+Partial derivative with respect to $x$:
+
+$$\frac{\partial{}}{\partial{x}}(24x - 6xy^2 - 8y^3) = 24 - 6y^2$$
+
+Partial derivative with respect to $y$:
+
+$$\frac{\partial{}}{\partial{y}}(24x - 6xy^2 - 8y^3) = -12xy - 24y^2$$
+
+Set both partial derivatives to 0 and solve simulatneously:
+
+$$24 - 6y^2 = 0\text{ and }-12xy - 24y^2 = 0\\
+6y^2 = 24\\
+y^2 = 4, y = \pm2\\
+-12xy - 24y^2 = 0\\
+-12x(2) - 24(2^2) = 0\\
+-24x - 96 = 0, x=-4\\
+-12x(-2) - 24(-2)^2 = 0\\
+24x - 96 = 0, x = 4\\
+(2, =4), (-2, 4)$$
+
+So (2, -4) and (-2, -4) are critical points.  We need to second partial derivatives to determine whether we have minima, maxima ro saddle points.
+
+$$f_{xx}(x, y) = \frac{\partial{}^2}{\partial{x}}(24x - 6xy^2 - 8y^3) = \frac{\partial{}}{\partial{x}}(24 - 6y^2) = 0\\
+f_{yy}(x, y) = \frac{\partial{}^2}{\partial{y}}(24x - 6xy^2 - 8y^3) = \frac{\partial{}}{\partial{y}}(-12xy - 24y^2) = -12x-48y\\
+f_{xy}(x, y) = \frac{\partial{}}{\partial{x}}(24x - 6xy^2 - 8y^3) = \frac{\partial{}}{\partial{y}}(24 - 6y^2) = -12y\\
+f_{yx}(x, y) = \frac{\partial{}}{\partial{y}}(24x - 6xy^2 - 8y^3) = \frac{\partial{}}{\partial{x}}(-12xy - 24y^2) = -12y$$
+
+We examine the determinant $D(x,y)$ of the Hessian of $f$ at each critical point.
+
+$$D(a, b) = f_{xx}(a,b)f_{yy}(a, b) - (f_{xy}(a,b))^2$$
+
+Points (2,-4), (-2, 4):
+
+$$D(2,-4) = 0 - (-12*-4)^2 = -(48^2)\\
+D(-2, 4) = 0 - (-12*4)(-12*4) = -(-48^2)$$
+
+* Since $D(2,-4)  < 0$, point (2, -4) is a saddle point 
+* Since $D(-2, 4) < 0$, point (-2, 4) is a saddle point
+* there are no maxima or minima
+
+### Solution with R
+
+```{r}
+f <- function(x, y) {24*x - 6*x*y^2 - 8*y^3}
+
+(f_x <- Deriv(f, "x"))
+(f_y <- Deriv(f, "y"))
+(f_xx <- Deriv(f_x, "x"))
+(f_yy <- Deriv(f_y, "y"))
+(f_xy <- Deriv(f_x, "y"))
+
+```
+
+### Solution with Python
+
+```{python}
+import sympy as sp
+from sympy import symbols, exp
+
+x, y = symbols('x y')
+
+f = 24*x - 6*x*y**2 - 8*y**3
+
+f_x = f.diff(x)
+f_y = f.diff(y)
+f_xx = f.diff(x, 2)
+f_yy = f.diff(y, 2)
+f_xy = f.diff(x, y)
+
+print('f: ', f)
+print('f_x: ', f_x)
+print('f_y: ', f_y)
+print('f_xx: ', f_xx)
+print('f_yy: ', f_yy)
+print('f_xy: ', f_xy)
+
+# Find Critical Points
+print('Critical Points: ', sp.solvers.solve([f_x, f_y], x, y))
+
+# Use Determinant and Hessian to determine if minima, max or saddle
+D = f_xx*f_yy - (f_xy)**2
+
+print('D(-4, 2) = ', D.subs([(x, -4), (y, 2)]))
+print('D(2, -4) = ', D.subs([(x, 4), (y, -2)]))
+```
+
+Since D(-4, 2) and D(4, -2) are both < 0, both points are saddle points.  There are no minima or maxima.
+
+## Problem 3
+
+A grocery store sells two brands of a product, the "house" brand and a "name" brand. The manager estimates that if she
+sells the "house" brand for $x$ dollars and the "name" brand for $y$ dollars, she will be able to sell $81 - 21x + 17y$ units of the "house" brand and $40 + 11x - 23y$ units of the "name" brand.
+
+### Step 1. 
+
+Find the revenue function R ( x, y ).
+
+$$x=Price_{house}\\
+y=Price_{name}\\
+Units_{house} = 40 + 11x - 23y\\
+Units_{name} = 81 - 21x + 17y\\
+Revenue_{house} = Price_{house} * Units_{house} = x(40 + 11x - 23y)\\
+Revenue_{name} = Price_{name} * Units_{name} = y(81 - 21x + 17y)\\
+Revenue_{total} = Revenue_{house} + Revenue_{name}\\
+Revenue_{total} = 40x + 44x^2 - 23xy + 81y - 21xy + 17y^2\\
+R(x, y) = Revenue_{total} = 44x^2 + 40x - 44xy + 81y + 17y^2$$
+
+### Step 2. 
+
+What is the revenue if she sells the "house" brand for \$2.30 and the "name" brand for \$4.10?
+
+```{r}
+R_xy <- function(x, y) {44*x^2 + 40*x - 44*x*y + 81*y + 17*y^2}
+
+R_xy(2.30, 4.10)
+```
+
+## Problem 4
+
+A company has a plant in Los Angeles and a plant in Denver. The firm is committed to produce a total of 96 units of a
+product each week. The total weekly cost is given by 
+
+$$C(x, y) = \frac{1}{6}x^2 + \frac{1}{6}y^2 + 7x + 25y + 700$$
+
+where $x$ is the number of units produced in Los Angeles and $y$ is the number of units produced in Denver. How many units should be produced in each plant to minimize the total weekly cost?
+
+```{python}
+from sympy import solve_linear
+
+# ----- Symbolic Math Solution -----
+x, y = symbols('x y')
+
+f = 1/6*x**2 + 1/6*y**2 + 7*x + 25*y + 700
+print('f: ', f)
+
+# since x+y=96, we solve for x=96-y and substitute 96-y for x in f
+# then solve for dC with respect to the single variable y
+f_y = f.subs(x, 96-y).diff(y)
+print('f_y: ', f_y)
+
+final_y = round(solve_linear(f_y)[1])
+final_x = round(96 - final_y)
+
+print('Symbolic Solution  ... x: ', final_x, ' y: ', final_y)
+
+# ----- Numerical Solution -----
+
+min_cost = 1e6
+x_soln = 0
+y_soln = 0
+
+for i in range(0,97):
+  c = f.subs([(x, i), (y, 96-i)])
+  if c < min_cost:
+    min_cost = c
+    x_soln = i
+    y_soln = 96-x_soln
+    
+print('Numerical Solution ... x: ', x_soln, ' y: ', y_soln, ' cost: ', round(c, 2))
+```
+
+
+
+
+## Problem 5
+
+Evaluate the double integral on the given region.
+
+$$\iint_{R}e^{(8x+3y)}dA;\ \ \ R: 2 \le x \le 4\text{ and }2\le y \le 4$$
+
+Write your answer in exact form without decimals.
+
+$$\int_{2}^{4}\int_{2}^{4}e^{(8x+3y)}\ dx\ dy\\
+u = (8x + 3y);\ \ \ du = 8\ dx\\
+\int_{2}^{4} \frac{1}{8}\int_{2}^{4}e^u\ du\ dy\\
+\int_{2}^{4} \frac{e^{8x+3y}}{8} |_{2}^{4}\ dy\\
+\int_{2}^{4} \frac{e^{3y+32}}{8} - \frac{e^{3y+16}}{8}\ dy\\
+\int_{2}^{4} \frac{e^{3y+32}}{8}\ dy - \int_{2}^{4} \frac{e^{3y+16}}{8}\ dy\\
+u=(3y+32);\ \ \ du=3\ dy\\
+\frac{1}{8}\frac{1}{3}\int_{2}^{4} e^{u}\ du - \int_{2}^{4} \frac{e^{3y+16}}{8}\ dy\\
+\frac{e^{3y+32}}{24}|_{2}^{4} - \int_{2}^{4} \frac{e^{3y+16}}{8}\ dy\\
+\frac{e^{44}-e^{38}}{24} - \int_{2}^{4} \frac{e^{3y+16}}{8}\ dy\\
+u=(3y+16);\ \ \ du=3\ dy\\
+\frac{e^{44}-e^{38}}{24} - \frac{1}{8}\frac{1}{3}\int_{2}^{4} e^{u}\ du\\
+\frac{e^{44}-e^{38}}{24} - \frac{e^{3y+16}}{24}|_{2}^{4}\\
+\frac{e^{44}-e^{38}}{24} - \frac{e^{28} - e^{22}}{24}\\
+\frac{e^{44}-e^{38} + e^{28} - e^{22}}{24}$$
