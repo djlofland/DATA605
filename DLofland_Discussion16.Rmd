@@ -1,0 +1,100 @@
+---
+title: "D605 - Discussion 16"
+author: "Donny Lofland"
+date: "5/13/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+library(Deriv)
+library(symengine)
+library(ggplot2)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Problem 12.5.26 (p.728)
+
+In Exercises 23 – 26, find $\frac{dy}{dx}$ using Implicit Differentiation and Theorem 12.5.3.
+
+$$\text{ln}(x^2 + xy + y^2) = 1$$
+
+### Theorem 12.5.3
+
+Theorem 12.5.3 - Implicit Differentiation
+
+Let $f$ be a differentiable function of $x$ and $y$, where $f(x, y) = c$ defines $y$ as an implicit function of $x$, for some constant $c$. Then
+
+$$\frac{dy}{dx} = -\frac{f_x(x,y)}{f_y(x,y)}$$
+
+### Analytical Solution:
+
+$$f(x, y) = \text{ln}(x^2 + xy + y^2) -1$$
+
+Partial Derivative of $f(x, y)$ with respect to $x$:
+
+$$\frac{\partial{}}{\partial{x}}(\text{ln}(x^2 + xy + y^2)) + \frac{\partial{}}{\partial{x}}(-1)\\
+\frac{\partial{}}{\partial{x}}(\text{ln}(x^2 + xy + y^2)) + 0\\
+\frac{\partial{}}{\partial{x}}(\text{ln}(x^2 + xy + y^2))$$
+
+Using the Chain Rule with: $u = x^2 +xy + y^2$:
+
+$$\frac{\partial{}}{\partial{x}}(\text{ln}(x^2 + xy + y^2)) = \frac{\partial{}\text{ln}(u)}{\partial{u}}\frac{\partial{u}}{\partial{x}},\\
+\text{where }u = x^2 + xy + y^2\text{ and } \frac{\partial{}}{\partial{u}}(ln(u)) = \frac{1}{u}\\
+= \frac{\frac{\partial{}}{\partial{x}}(x^2 + xy + y^2)}{x^2 + xy + y^2}\\
+= \frac{2x + y}{x^2 + xy + y^2}\\$$
+
+Partial Derivative of $f(x, y)$ with respect to $y$:
+
+$$\frac{\partial{}}{\partial{y}}(\text{ln}(x^2 + xy + y^2)) + \frac{\partial{}}{\partial{y}}(-1)\\
+\frac{\partial{}}{\partial{y}}(\text{ln}(x^2 + xy + y^2)) + 0\\
+\frac{\partial{}}{\partial{y}}(\text{ln}(x^2 + xy + y^2))$$
+
+Using the Chain Rule with: $u = x^2 +xy + y^2$:
+
+$$\frac{\partial{}}{\partial{y}}(\text{ln}(x^2 + xy + y^2)) = \frac{\partial{}\text{ln}(u)}{\partial{u}}\frac{\partial{u}}{\partial{y}},\\
+\text{where }u = x^2 + xy + y^2\text{ and } \frac{\partial{}}{\partial{u}}(ln(u)) = \frac{1}{u}\\
+= \frac{\frac{\partial{}}{\partial{y}}(x^2 + xy + y^2)}{x^2 + xy + y^2}\\
+= \frac{2y + x}{x^2 + xy + y^2}$$
+
+Substituting into Theorem 12.5.3:
+
+$$\frac{dy}{dx} = -\frac{f_x(x,y)}{f_y(x,y)}\\
+\frac{dy}{dx} = -\frac{\frac{2x + y}{x^2 + xy + y^2}}{\frac{2y + x}{x^2 + xy + y^2}}\\
+\frac{dy}{dx} = -(\frac{2x + y}{x^2 + xy + y^2})(\frac{x^2 + xy + y^2}{2y + x})\\
+\frac{dy}{dx} = -\frac{2x + y}{2y + x}$$
+
+### Solution with R
+
+```{r}
+# Using Deriv package
+f <- function(x, y){log(x^2 + x*y + y^2) - 1}
+
+(f_partial_x <- Deriv(f, "x"))
+(f_partial_y <- Deriv(f, "y"))
+```
+
+This confirms our partial derivatives above are correct.  To solve the Theorem 12.5.3 symbolically, I pulled in the SymEngine.R package which can handle symbolic math.  Note: SymEngine lets us define our variables and create expressions directly.
+
+```{r}
+# Using SymEngine.R package
+old_options <- options(symengine.latex = TRUE, symengine.latex.center = TRUE)
+use_vars(x, y, .quiet = TRUE)
+
+f <- (log(x^2 + x*y + y^2) - 1)
+
+(f_partial_x <- D(f, x))
+(f_partial_y <- D(f, y))
+
+(dx_dy <- -f_partial_x / f_partial_y)
+options(old_options)
+```
+
+Other than the annoying floating point exponentials and unnecessary 0.0's, this matches our analytical solution above.

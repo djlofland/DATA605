@@ -1,0 +1,105 @@
+---
+title: "D605 - Discussion 15"
+author: "Donny Lofland"
+date: "5/10/2020"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+library(ggplot2)
+```
+
+Source files: [https://github.com/djlofland/DATA605_S2020/tree/master/]
+
+## Problem 8.8.18
+
+Use the Taylor Series in 8.8.1 to verify:
+
+$$sin(-x) = -sin(x)$$
+
+### Analytics Solution
+
+Definition 8.7.1 Taylor Polynomial of degree $n$ of $f$ at $x=c$:
+
+$$p_n(x) = f(c) + f'(c)(x-c) + \frac{f''(c)}{2!}(x-c)^2 + \frac{f'''(c)}{3!}(x-c)^3 + ... + \frac{f^{(n)}(c)}{n!}(x-c)^n$$
+
+So we need our derivativesat $c=0$:
+
+$$f(x) = sin(x)\ \ \ f(0) = 0\\
+f'(x) = cos(x)\ \ \ f'(0) = 1\\
+f''(x) = -sin(x)\ \ \ f''(0) = 0\\
+f'''(x) = -cos(x)\ \ \ f'''(0) = -1\\
+f''''(x) = sin(x)\ \ \ f''''(0) = 0$$
+
+Substituting into Taylor Definition:
+
+$$sin(x) = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + ... = \sum_{n=0}^{\infty}(-1)^{(n)}\frac{x^{2n+1}}{(2n+1)!}$$
+
+for $sin(-x)$, just substitute $-x$ in for $x$:
+
+$$sin(-x) = -x + \frac{x^3}{3!} - \frac{x^5}{5!} + \frac{x^7}{7!} - ... = \sum_{n=0}^{\infty}(-1)^{(n+1)}\frac{x^{2n+1}}{(2n+1)!}$$
+
+for $-sin(x)$, just multiply the $sin(x)$ Taylor series by $-1$:
+
+$$-sin(x) = -x + \frac{x^3}{3!} - \frac{x^5}{5!} + \frac{x^7}{7!} - ... = \sum_{n=0}^{\infty}(-1)^{(n+1)}\frac{x^{2n+1}}{(2n+1)!}$$
+
+So $sin(-x) = -sin(x)$
+
+### Numerical Solution:
+
+```{r}
+library(tidyverse)
+
+max_terms <- 3
+x_range <- seq(-pi, pi, by=pi/32)
+
+data <- tibble(terms = double(),
+               x = double(),
+               sin_minus_x = double(),
+               minus_sin_x = double(),
+               sin_taylor = double())
+
+for (terms in 1:max_terms) {
+  for (x in x_range) {
+    term <- 0
+    sin_taylor <- 0
+    
+    for (n in 0:terms) {
+      term <- (-1)^(n+1) * x^(2*n+1) / factorial(2*n+1)
+      sin_taylor = sin_taylor + term 
+    }
+    
+    data <- data %>% add_row(terms = terms, 
+                             x = x, 
+                             sin_minus_x = sin(-x), 
+                             minus_sin_x = -sin(x),
+                             sin_taylor = sin_taylor)
+  }
+}
+
+colors <- c('#000000', '#ff0000', '#66ffff', '#6699ff', '#0066ff')
+
+mdata <- data %>% gather("method", "y", -terms, -x) %>% select(method, terms, x, y)
+sin_minus_x <- mdata %>% filter(method=='sin_minus_x' & terms==1) %>% select(method, x, y)
+minus_sin_x <- mdata %>% filter(method=='minus_sin_x' & terms==1) %>% select(method, x, y)
+taylor_sin <- mdata %>% filter(method=='sin_taylor') %>% mutate(method=paste(method, '_', terms, sep="")) %>% select(method, x, y)
+
+data <- bind_rows(sin_minus_x, minus_sin_x, taylor_sin)
+
+ggplot() + 
+  geom_line(aes(x=x, y=y, color=method), position=position_jitter(w=0.02, h=0), data) +
+  theme(legend.position="bottom") + 
+  scale_color_manual(values=colors) +
+  labs(title="Taylor Approx for f(x) = sin(-x) at C=0\n by Number of Taylor Terms",
+       x ="x", 
+       y = "f(x)")
+
+```
+
