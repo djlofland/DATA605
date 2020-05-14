@@ -182,6 +182,8 @@ $$C(x, y) = \frac{1}{6}x^2 + \frac{1}{6}y^2 + 7x + 25y + 700$$
 
 where $x$ is the number of units produced in Los Angeles and $y$ is the number of units produced in Denver. How many units should be produced in each plant to minimize the total weekly cost?
 
+### Symbolic Solution (Python)
+
 ```{python}
 from sympy import solve_linear
 
@@ -200,7 +202,13 @@ final_y = round(solve_linear(f_y)[1])
 final_x = round(96 - final_y)
 
 print('Symbolic Solution  ... x: ', final_x, ' y: ', final_y)
+```
 
+### Numerical Solution (Python)
+
+Brute Force Method
+
+```{python}
 # ----- Numerical Solution -----
 
 min_cost = 1e6
@@ -228,6 +236,8 @@ $$\iint_{R}e^{(8x+3y)}dA;\ \ \ R: 2 \le x \le 4\text{ and }2\le y \le 4$$
 
 Write your answer in exact form without decimals.
 
+### Analytical Solution
+
 $$\int_{2}^{4}\int_{2}^{4}e^{(8x+3y)}\ dx\ dy\\
 u = (8x + 3y);\ \ \ du = 8\ dx\\
 \int_{2}^{4} \frac{1}{8}\int_{2}^{4}e^u\ du\ dy\\
@@ -240,6 +250,19 @@ u=(3y+32);\ \ \ du=3\ dy\\
 \frac{e^{44}-e^{38}}{24} - \int_{2}^{4} \frac{e^{3y+16}}{8}\ dy\\
 u=(3y+16);\ \ \ du=3\ dy\\
 \frac{e^{44}-e^{38}}{24} - \frac{1}{8}\frac{1}{3}\int_{2}^{4} e^{u}\ du\\
-\frac{e^{44}-e^{38}}{24} - \frac{e^{3y+16}}{24}|_{2}^{4}\\
+\frac{e^{44}-e^{38}}{24} -\frac{e^{3y+16}}{24}|_{2}^{4}\\
 \frac{e^{44}-e^{38}}{24} - \frac{e^{28} - e^{22}}{24}\\
-\frac{e^{44}-e^{38} + e^{28} - e^{22}}{24}$$
+\frac{e^{44}-e^{38} - e^{28} + e^{22}}{24}$$
+
+### Symbolic Solution (Python)
+
+```{python}
+from sympy import integrate, Integral
+x, y = symbols('x y')
+
+f = exp(8*x + 3*y)
+f
+integrate(f, (x, 2, 4), (y, 2, 4))
+```
+
+Note: By rearrangement and factoring out an $e^{22}$ and $e^{28}$, we get the same answer as with the analytical appraoch above.
