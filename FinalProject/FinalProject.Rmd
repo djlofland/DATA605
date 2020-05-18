@@ -317,7 +317,5 @@ percent_95 <- quantile(train$PropertyAge, c(0.95))
 
 *10 points.  Modeling.*  Build some type of multiple regression model and submit your model to the competition board.  Provide your complete model summary and results with analysis.  Report your Kaggle.com user name and score.
 
-```{r Problem_2D}
-
-```
-
+> Please see my GitHub repo and download/view the KaggleProject.ipynb and/or KaggleProject.html files.  
+[https://github.com/djlofland/DATA605_S2020/tree/master/FinalProject/](https://github.com/djlofland/DATA605_S2020/tree/master/FinalProject/)
